@@ -10,7 +10,6 @@ from typing import Union
 
 import gator
 import rich
-import time
 from rich.progress import Progress
 
 from gatorgrade.input.checks import GatorGraderCheck
@@ -284,33 +283,46 @@ def run_checks(
 ) -> bool:
     """Run shell and GatorGrader checks and display whether each has passed or failed.
 
-        Also, print a list of all failed checks with their diagnostics and a summary message that
+        Also, display a progress bar and a list of all failed checks with their diagnostics and a summary message that
         shows the overall fraction of passed checks.
 
     Args:
         checks: The list of shell and GatorGrader checks to run.
-    """
+    """   
     results = []
-    # run each of the checks
-    for check in checks:
-        result = None
-        # run a shell check; this means
-        # that it is going to run a command
-        # in the shell as a part of a check
-        # store the command that ran
-        command_output = None
-        if isinstance(check, ShellCheck):
-            result = _run_shell_check(check)
-            command_output = check.command
-        # run a check that GatorGrader implements
-        elif isinstance(check, GatorGraderCheck):
-            result = _run_gg_check(check)        
-
-        # there were results from running checks
-        # and thus they must be displayed
-        if result is not None:
-            result.print()
-            results.append((result, command_output))
+    # check how many tests are being ran
+    total_checks = len(checks)
+    # initialize to track how many checks pass
+    passed_count = 0
+    
+    # create progress bar using rich's Progress
+    with Progress() as progress:
+        # add a progress task for tracking
+        task = progress.add_task("[green]Running checks...", total=total_checks)
+        # run each of the checks
+        for i, check in enumerate(checks):
+            result = None
+            command_output = None
+            # run a shell check; this means
+            # that it is going to run a command
+            # in the shell as a part of a check
+            # store the command that ran
+            if isinstance(check, ShellCheck):
+                result = _run_shell_check(check)
+                command_output = check.command
+            elif isinstance(check, GatorGraderCheck):
+                result = _run_gg_check(check)        
+            # there were results from running checks
+            # and thus they must be displayed
+            if result is not None:
+                result.print()
+                results.append((result, command_output))
+                
+                # increment passed count if the check passed
+                if result.passed:
+                    passed_count += 1
+            # Update progress bar to reflect % of checks that passed
+            progress.update(task, completed=passed_count)
     # determine if there are failures and then display them
     failed_results = list(filter(lambda result: not result[0].passed, results))
     # print failures list if there are failures to print 
@@ -321,51 +333,24 @@ def run_checks(
             result[0].print(show_diagnostic=True)
             if result[1] is not None:
                 rich.print(f"[blue]   → Command that failed: [green]{result[1]}")
-    # determine how many of the checks passed and then
-    # compute the total percentage of checks passed
-    passed_count = len(results) - len(failed_results)
-    update_progress_bar(passed_count, len(results))
+    
     # prevent division by zero if no results
     if len(results) == 0:
         percent = 0
     else:
         percent = round(passed_count / len(results) * 100)
-
     # if the report is wanted, create output in line with their specifications
     if all(report):
         report_output_data = create_report_json(passed_count, results, percent)
         configure_report(report, report_output_data)
-
-    # compute summary results and display them in the console
+    # compute summary results and display them
     summary = f"Passed {passed_count}/{len(results)} ({percent}%) of checks for {Path.cwd().name}!"
     summary_color = "green" if passed_count == len(results) else "bright white"
     print_with_border(summary, summary_color)
-    # determine whether or not the run was a success or not:
-    # if all of the tests pass then the function returns True;
-    # otherwise the function must return False
-    summary_status = True if passed_count == len(results) else False
-    return summary_status
 
-def update_progress_bar(current: int, total: int) -> str:
-    """Display a dynamic progress bar with rich's progress bar and return a message showing how many checks have been completed."""
+    # return True if all tests pass, False otherwise
+    return passed_count == len(results)
 
-    message = ""
-
-    with Progress() as progress:
-        task = progress.add_task(
-            "[green]Running checks...", total=total
-        )  # Add a progress task for tracking
-
-        # Update the progress bar as the checks are performed
-        for i in range(current):
-            progress.update(task, advance=1)
-            time.sleep(0.05)
-
-            percentage = round((i + 1) / total * 100, 2)
-            # message = f"{percentage}% of checks complete"
-            message = f"Passed {current}/{total} ({percentage}%) of checks for {Path.cwd().name}!"
-
-    return message
 
 def print_with_border(text: str, rich_color: str):
     """Print text with a border.
