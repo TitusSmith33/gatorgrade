@@ -9,8 +9,10 @@ from typing import Tuple
 from typing import Union
 
 import gator
+import random
 import rich
 from rich.progress import Progress
+
 
 from gatorgrade.input.checks import GatorGraderCheck
 from gatorgrade.input.checks import ShellCheck
@@ -288,13 +290,12 @@ def run_checks(
 
     Args:
         checks: The list of shell and GatorGrader checks to run.
-    """   
+    """
     results = []
     # check how many tests are being ran
     total_checks = len(checks)
     # initialize to track how many checks pass
     passed_count = 0
-    
     # create progress bar using rich's Progress
     with Progress() as progress:
         # add a progress task for tracking
@@ -311,13 +312,13 @@ def run_checks(
                 result = _run_shell_check(check)
                 command_output = check.command
             elif isinstance(check, GatorGraderCheck):
-                result = _run_gg_check(check)        
+                result = _run_gg_check(check)
             # there were results from running checks
             # and thus they must be displayed
             if result is not None:
                 result.print()
                 results.append((result, command_output))
-                
+
                 # increment passed count if the check passed
                 if result.passed:
                     passed_count += 1
@@ -379,6 +380,23 @@ def print_with_border(text: str, rich_color: str):
     rich.print(f"[{rich_color}]\t{vert} {text} {vert}")
     rich.print(f"[{rich_color}]\t{downleft}{line}{downright}\n")
 
+quotes = [
+
+    "DON'T GIVE UP, YOU GOT THIS!!!",
+
+    "KEEP GOING, YOUR SO CLOSE!!!",
+
+    "IT'S NOT SO BAD, KEEP YOUR HEAD UP",
+
+    "KEEP YOUR HEAD UP, FAILURE IS THE FIRST STEP TO SUCCESS"
+
+]
+
+def motivation() -> str :
+
+    # A function to get the motivational quotes
+
+    return random.choice(quotes)
 
 def print_motivation(passed: int, total: int):
     """Prints a motivational message when checks passed is between 25% and 75%."""
@@ -392,7 +410,7 @@ def print_motivation(passed: int, total: int):
         if percentage > 0.75:
             # prints out a panel container to the console
             rich.print(rich.Panel(
-                        #motivation(),
+                        motivation(),
                         expand=False,
                         title="Motivation",
                         border_style="bright_cyan",
@@ -400,7 +418,7 @@ def print_motivation(passed: int, total: int):
         else:
             # prints out a panel container to the console
             rich.print(rich.Panel(
-                        #motivation(),
+                        motivation(),
                         expand=False,
                         title="Motivation",
                         border_style="bright_cyan",
