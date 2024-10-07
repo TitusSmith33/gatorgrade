@@ -11,6 +11,7 @@ from typing import Union
 import gator
 import random
 import rich
+from rich.panel import Panel
 from rich.progress import Progress
 
 
@@ -335,7 +336,6 @@ def run_checks(
             result[0].print(show_diagnostic=True)
             if result[1] is not None:
                 rich.print(f"[blue]   → Command that failed: [green]{result[1]}")
-            print_motivation(passed_count, total_checks)
     # prevent division by zero if no results
     if len(results) == 0:
         percent = 0
@@ -346,9 +346,14 @@ def run_checks(
         report_output_data = create_report_json(passed_count, results, percent)
         configure_report(report, report_output_data)
     # compute summary results and display them
-    summary = f"Passed {passed_count}/{len(results)} ({percent}%) of checks for {Path.cwd().name}!"
     summary_color = "green" if passed_count == len(results) else "bright_red"
-    print_with_border(summary, summary_color)
+    summary = f"Passed {passed_count}/{len(results)} ({percent}%) of checks for {Path.cwd().name}!"
+    rich.print(Panel(
+                summary,
+                expand=True,
+                title=None,
+                style=summary_color
+                ))
 
     # return True if all tests pass, False otherwise
     return passed_count == len(results)
@@ -378,40 +383,3 @@ def print_with_border(text: str, rich_color: str):
     rich.print(f"[{rich_color}]\n\t{upleft}{line}{upright}")
     rich.print(f"[{rich_color}]\t{vert} {text} {vert}")
     rich.print(f"[{rich_color}]\t{downleft}{line}{downright}\n")
-
-
-quotes = [
-    "DON'T GIVE UP, YOU GOT THIS!!!",
-    "KEEP GOING, YOUR SO CLOSE!!!",
-    "IT'S NOT SO BAD, KEEP YOUR HEAD UP",
-    "KEEP YOUR HEAD UP, FAILURE IS THE FIRST STEP TO SUCCESS"
-]
-def motivation(quotes: List[str]) -> str :
-    """Returns a random motivational quote from the quotes list."""
-    # gets a motivational quote
-    return random.choice(quotes)
-
-
-def print_motivation(passed: int, total: int):
-    """Prints a motivational message when checks passed is between 25% and 75%."""
-    total *= 1.0
-    # creates the value percentage to use for comparison
-    percentage = passed / total
-    # evaluates whether percentage fits into 25% to 75% range
-    if percentage >= 0.25:
-        if percentage < 0.75:
-            # prints out a panel container to the console
-            rich.print(rich.Panel(
-                        motivation(quotes),
-                        expand=False,
-                        title="Motivation",
-                        border_style="bright_cyan",
-                        ))
-        elif percentage <= 0.99:
-            # prints out a panel container to the console
-            rich.print(rich.Panel(
-                        "[magenta]Almost [magenta]There!",
-                        expand=False,
-                        title="Motivation",
-                        border_style="bright_cyan",
-                        ))
