@@ -1500,7 +1500,12 @@ report_params[2]: name of the file or env</p></td>
 
         <details class="quote">
           <summary>Source code in <code>gatorgrade/output/output.py</code></summary>
-          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">361</span>
+          <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
 <span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
@@ -1518,12 +1523,7 @@ report_params[2]: name of the file or env</p></td>
 <span class="normal">376</span>
 <span class="normal">377</span>
 <span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_with_border</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rich_color</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">379</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">print_with_border</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rich_color</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print text with a border.</span>
 
 <span class="sd">    Args:</span>
@@ -1668,12 +1668,7 @@ shows the overall fraction of passed checks.
 <span class="normal">350</span>
 <span class="normal">351</span>
 <span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span>
+<span class="normal">353</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">run_checks</span><span class="p">(</span>
     <span class="n">checks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">ShellCheck</span><span class="p">,</span> <span class="n">GatorGraderCheck</span><span class="p">]],</span> <span class="n">report</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run shell and GatorGrader checks and display whether each has passed or failed.</span>
@@ -1687,8 +1682,6 @@ shows the overall fraction of passed checks.
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># check how many tests are being ran</span>
     <span class="n">total_checks</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">checks</span><span class="p">)</span>
-    <span class="c1"># initialize to track how many checks pass</span>
-    <span class="n">passed_count</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="c1"># create progress bar using rich&#39;s Progress</span>
     <span class="k">with</span> <span class="n">Progress</span><span class="p">()</span> <span class="k">as</span> <span class="n">progress</span><span class="p">:</span>
         <span class="c1"># add a progress task for tracking</span>
@@ -1711,12 +1704,8 @@ shows the overall fraction of passed checks.
             <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">result</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">result</span><span class="p">,</span> <span class="n">command_output</span><span class="p">))</span>
-
-                <span class="c1"># increment passed count if the check passed</span>
-                <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">passed</span><span class="p">:</span>
-                    <span class="n">passed_count</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="c1"># Update progress bar to reflect % of checks that passed</span>
-            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">completed</span><span class="o">=</span><span class="n">passed_count</span><span class="p">)</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">task</span><span class="p">,</span> <span class="n">advance</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="c1"># determine if there are failures and then display them</span>
     <span class="n">failed_results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">result</span><span class="p">:</span> <span class="ow">not</span> <span class="n">result</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">passed</span><span class="p">,</span> <span class="n">results</span><span class="p">))</span>
     <span class="c1"># print failures list if there are failures to print </span>
@@ -1728,6 +1717,7 @@ shows the overall fraction of passed checks.
             <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">rich</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[blue]   → Command that failed: [green]</span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="c1"># prevent division by zero if no results</span>
+    <span class="n">passed_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed_results</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="n">percent</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
