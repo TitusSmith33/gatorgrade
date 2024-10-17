@@ -329,7 +329,6 @@ def run_checks(
     failed_results = list(filter(lambda result: not result[0].passed, results))
     # print failures list if there are failures to print 
     # and print what ShellCheck command that Gatorgrade ran
-    # print motivational mesage if between 25% and 75% passed checks
     if len(failed_results) > 0:
         print("\n-~-  FAILURES  -~-\n")
         for result in failed_results:
