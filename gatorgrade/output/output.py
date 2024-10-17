@@ -295,8 +295,6 @@ def run_checks(
     results = []
     # check how many tests are being ran
     total_checks = len(checks)
-    # initialize to track how many checks pass
-    passed_count = 0
     # create progress bar using rich's Progress
     with Progress() as progress:
         # add a progress task for tracking
@@ -319,12 +317,8 @@ def run_checks(
             if result is not None:
                 result.print()
                 results.append((result, command_output))
-
-                # increment passed count if the check passed
-                if result.passed:
-                    passed_count += 1
             # Update progress bar to reflect % of checks that passed
-            progress.update(task, completed=passed_count)
+            progress.update(task, advance=1)
     # determine if there are failures and then display them
     failed_results = list(filter(lambda result: not result[0].passed, results))
     # print failures list if there are failures to print 
@@ -336,6 +330,7 @@ def run_checks(
             if result[1] is not None:
                 rich.print(f"[blue]   → Command that failed: [green]{result[1]}")
     # prevent division by zero if no results
+    passed_count = len(results) - len(failed_results)
     if len(results) == 0:
         percent = 0
     else:
