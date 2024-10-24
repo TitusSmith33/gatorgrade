@@ -2,18 +2,20 @@
 import datetime
 import json
 import os
+import random
 import subprocess
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict
+from typing import List
 from typing import Tuple
 from typing import Union
 
 import gator
-import random
 import rich
 from rich.panel import Panel
-from rich.progress import Progress, TextColumn, BarColumn
-
+from rich.progress import BarColumn
+from rich.progress import Progress
+from rich.progress import TextColumn
 
 from gatorgrade.input.checks import GatorGraderCheck
 from gatorgrade.input.checks import ShellCheck
