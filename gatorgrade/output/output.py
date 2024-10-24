@@ -12,7 +12,7 @@ import gator
 import random
 import rich
 from rich.panel import Panel
-from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn
+from rich.progress import Progress, TextColumn, BarColumn
 
 
 from gatorgrade.input.checks import GatorGraderCheck
