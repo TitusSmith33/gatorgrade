@@ -12,7 +12,7 @@ import gator
 import random
 import rich
 from rich.panel import Panel
-from rich.progress import Progress
+from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn
 
 
 from gatorgrade.input.checks import GatorGraderCheck
@@ -282,7 +282,7 @@ def write_json_or_md_file(file_name, content_type, content):
 
 
 def run_checks(
-    checks: List[Union[ShellCheck, GatorGraderCheck]], report: Tuple[str, str, str]
+    checks: List[Union[ShellCheck, GatorGraderCheck]], report: Tuple[str, str, str], debug_mode = False
 ) -> bool:
     """Run shell and GatorGrader checks and display whether each has passed or failed.
 
@@ -291,12 +291,17 @@ def run_checks(
 
     Args:
         checks: The list of shell and GatorGrader checks to run.
+        debug_mode: Boolean to indicate wether debug mode is enabled.
     """
     results = []
     # check how many tests are being ran
     total_checks = len(checks)
     # create progress bar using rich's Progress
-    with Progress() as progress:
+    with Progress(
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(bar_width=40, style="red", complete_style="green", finished_style="green"),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%")
+    ) as progress:
         # add a progress task for tracking
         task = progress.add_task("[green]Running checks...", total=total_checks)
         # run each of the checks
@@ -317,8 +322,13 @@ def run_checks(
             if result is not None:
                 result.print()
                 results.append((result, command_output))
-            # Update progress bar to reflect % of checks that passed
-            progress.update(task, advance=1)
+            # Update progress bar behavior based on current mode
+            if debug_mode:
+                # display progress bar for which checks have been ran
+                progress.update(task, advance=1)
+            else:
+                if result and result.passed:
+                    progress.update(task, advance=1)
     # determine if there are failures and then display them
     failed_results = list(filter(lambda result: not result[0].passed, results))
     # print failures list if there are failures to print 
