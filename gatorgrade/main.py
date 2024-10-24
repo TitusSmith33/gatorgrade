@@ -47,7 +47,7 @@ def gatorgrade(
     ),
     debug_mode: bool = typer.Option(
         False, "--debug_mode", help="Enable debug mode for the progress bar."
-    )
+    ),
 ):
     """Run the GatorGrader checks in the specified gatorgrade.yml file."""
     # if ctx.subcommand is None then this means

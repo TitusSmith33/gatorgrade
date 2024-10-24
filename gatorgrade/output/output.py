@@ -280,8 +280,11 @@ def write_json_or_md_file(file_name, content_type, content):
             "\n[red]Can't open or write the target file, check if you provide a valid path"
         ) from e
 
+
 def run_checks(
-    checks: List[Union[ShellCheck, GatorGraderCheck]], report: Tuple[str, str, str], debug_mode = False
+    checks: List[Union[ShellCheck, GatorGraderCheck]],
+    report: Tuple[str, str, str],
+    debug_mode=False,
 ) -> bool:
     """Run shell and GatorGrader checks and display whether each has passed or failed.
 
@@ -298,8 +301,10 @@ def run_checks(
     # create progress bar using rich's Progress
     with Progress(
         TextColumn("[progress.description]{task.description}"),
-        BarColumn(bar_width=40, style="red", complete_style="green", finished_style="green"),
-        TextColumn("[progress.percentage]{task.percentage:>3.0f}%")
+        BarColumn(
+            bar_width=40, style="red", complete_style="green", finished_style="green"
+        ),
+        TextColumn("[progress.percentage]{task.percentage:>3.0f}%"),
     ) as progress:
         # add a progress task for tracking
         task = progress.add_task("[green]Running checks...", total=total_checks)
@@ -330,7 +335,7 @@ def run_checks(
                     progress.update(task, advance=1)
     # determine if there are failures and then display them
     failed_results = list(filter(lambda result: not result[0].passed, results))
-    # print failures list if there are failures to print 
+    # print failures list if there are failures to print
     # and print what ShellCheck command that Gatorgrade ran
     if len(failed_results) > 0:
         print("\n-~-  FAILURES  -~-\n")
@@ -351,56 +356,61 @@ def run_checks(
     # compute summary results and display them
     summary_color = "green" if passed_count == len(results) else "bright_red"
     summary = f"Passed {passed_count}/{len(results)} ({percent}%) of checks for {Path.cwd().name}!"
-    rich.print(Panel(
-                summary,
-                expand=True,
-                title=None,
-                style=summary_color
-                ))
+    rich.print(Panel(summary, expand=True, title=None, style=summary_color))
 
     # return True if all tests pass, False otherwise
     return passed_count == len(results)
+
 
 quotes = {
     "low_motivation": [
         "The journey of 1000 miles begins with a single step",
         "Keep pushing, you're just getting started!",
-        "Hang in there; the best is yet to come!"
+        "Hang in there; the best is yet to come!",
     ],
     "mid_motivation": [
         "50% there",
         "Halfway there, keep going strong!",
-        "You're making great progress!"
+        "You're making great progress!",
     ],
     "high_motivation": [
         "Congrats, you're done!",
         "Almost there, don't give up now!",
-        "Finish line is in sight!"
-    ]
+        "Finish line is in sight!",
+    ],
 }
+
+
 def motivation(quotes: List[str]) -> str:
     return random.choice(quotes)
+
 
 def print_motivation(passed: int, total: int, quotes: Dict[str, List[str]]):
     total = float(total)
     percentage = passed / total
 
     if 0.25 <= percentage < 0.75:
-        rich.print(Panel(
-            motivation(quotes["low_motivation"]),
-            expand=False,
-            title="Motivation",
-            border_style="bright_cyan",
-        ))
+        rich.print(
+            Panel(
+                motivation(quotes["low_motivation"]),
+                expand=False,
+                title="Motivation",
+                border_style="bright_cyan",
+            )
+        )
     elif percentage <= 0.99:
-        rich.print(Panel(
-            "[magenta]Almost [magenta]There!",
-            expand=False,
-            title="Motivation",
-            border_style="bright_cyan",
-        ))
+        rich.print(
+            Panel(
+                "[magenta]Almost [magenta]There!",
+                expand=False,
+                title="Motivation",
+                border_style="bright_cyan",
+            )
+        )
+
 
 print_motivation(50, 100, quotes)
+
 
 def print_with_border(text: str, rich_color: str):
     """Print text with a border.
