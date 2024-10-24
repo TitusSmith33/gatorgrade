@@ -361,6 +361,7 @@ def run_checks(
     # return True if all tests pass, False otherwise
     return passed_count == len(results)
 
+
 def print_with_border(text: str, rich_color: str):
     """Print text with a border.
 
