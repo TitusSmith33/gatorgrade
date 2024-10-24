@@ -4,7 +4,7 @@ import json
 import os
 import subprocess
 from pathlib import Path
-from typing import List
+from typing import List, Dict
 from typing import Tuple
 from typing import Union
 
@@ -280,7 +280,6 @@ def write_json_or_md_file(file_name, content_type, content):
             "\n[red]Can't open or write the target file, check if you provide a valid path"
         ) from e
 
-
 def run_checks(
     checks: List[Union[ShellCheck, GatorGraderCheck]], report: Tuple[str, str, str]
 ) -> bool:
@@ -352,6 +351,46 @@ def run_checks(
     # return True if all tests pass, False otherwise
     return passed_count == len(results)
 
+quotes = {
+    "low_motivation": [
+        "The journey of 1000 miles begins with a single step",
+        "Keep pushing, you're just getting started!",
+        "Hang in there; the best is yet to come!"
+    ],
+    "mid_motivation": [
+        "50% there",
+        "Halfway there, keep going strong!",
+        "You're making great progress!"
+    ],
+    "high_motivation": [
+        "Congrats, you're done!",
+        "Almost there, don't give up now!",
+        "Finish line is in sight!"
+    ]
+}
+def motivation(quotes: List[str]) -> str:
+    return random.choice(quotes)
+
+def print_motivation(passed: int, total: int, quotes: Dict[str, List[str]]):
+    total = float(total)
+    percentage = passed / total
+
+    if 0.25 <= percentage < 0.75:
+        rich.print(Panel(
+            motivation(quotes["low_motivation"]),
+            expand=False,
+            title="Motivation",
+            border_style="bright_cyan",
+        ))
+    elif percentage <= 0.99:
+        rich.print(Panel(
+            "[magenta]Almost [magenta]There!",
+            expand=False,
+            title="Motivation",
+            border_style="bright_cyan",
+        ))
+
+print_motivation(50, 100, quotes)
 
 def print_with_border(text: str, rich_color: str):
     """Print text with a border.
